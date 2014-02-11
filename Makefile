@@ -14,3 +14,4 @@ all: so
 
 so: $(AVL_SRC)
 	$(CC) $(AVL_SRC) $(LDFLAGS) -o lib$(AVL_LIB).so
+	cp lib$(AVL_LIB).so /lib/
