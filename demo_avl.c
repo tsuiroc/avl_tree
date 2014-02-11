@@ -1,4 +1,11 @@
 #include "demo_avl.h" 
+#ifndef true
+#define true  1
+#endif
+
+#ifndef false 
+#define false 0
+#endif
 
 int avl_search(avl_node* root, int item, avl_node **node)
 {
@@ -19,58 +26,105 @@ int avl_search(avl_node* root, int item, avl_node **node)
         return  avl_search(root->lchild, item, node);
 }
 
-int avl_insert(avl_node* root, int item)
+static inline int Height(avl_node *node)
 {
-    avl_node *parent = root, *cur;
-    
-    if(NULL == root)
-        return ERROR;
-
-    if(avl_search(root, item, &parent))
-        return OK;
-
-    cur = (avl_node*)malloc(sizeof(avl_node));
-    cur->parent = parent;
-    cur->key    = item;
-    cur->lchild = NULL;
-    cur->rchild = NULL;
-    cur->balance= 0;
-
-    if(item < parent->key)
-        parent->lchild = cur;
-    else
-        parent->rchild = cur;
-
-    return OK;
-
+    return (node == NULL ? 0:node->height);
 }
 
-avl_node* avl_create(int *item, int size)
+avl_node* avl_init_node(int item)
 {
-    int i, ret;
-    avl_node *root = NULL;
-    if(size < 1)
-        return NULL;
-
-    root = (avl_node *)malloc(sizeof(avl_node));
-    if(root == NULL)
+    avl_node *node = NULL;
+    node = (avl_node *)malloc(sizeof(avl_node));
+    if(node == NULL)
         return NULL;
     
-    memset(root, 0x00, sizeof(root));
-    root->parent = NULL;
-    root->lchild = NULL;
-    root->rchild = NULL;
-    root->key    = item[0];
-    root->balance= 0;
+    memset(node, 0x00, sizeof(node));
 
-    for(i = 1; i < size; i++)
+    node->parent = NULL;
+    node->lchild = NULL;
+    node->rchild = NULL;
+    node->key    = item;
+    node->height     = 0;
+
+    return node;
+}
+avl_node* avl_right_rotate(avl_node *root)
+{
+    avl_node *tmp = root->lchild;
+    root->lchild = tmp->rchild;
+    tmp->rchild = root;
+
+    root->height = MAX(Height(root->lchild), Height(root->rchild)) + 1;
+    tmp->height = MAX(Height(tmp->lchild), Height(tmp->rchild)) + 1;
+    
+    return tmp;
+}
+
+avl_node* avl_left_rotate(avl_node *root)
+{
+    avl_node *tmp = root->rchild;
+    root->rchild = tmp->lchild;
+    tmp->lchild = root;
+
+    root->height = MAX(Height(root->lchild), Height(root->rchild)) + 1;
+    tmp->height = MAX(Height(tmp->lchild), Height(tmp->rchild)) + 1;
+    
+    return tmp;
+}
+
+avl_node* avl_leftright_rotate(avl_node *root)
+{
+    root->lchild = avl_left_rotate(root->lchild);
+    return avl_left_rotate(root);
+}
+
+avl_node* avl_rightleft_rotate(avl_node *root)
+{
+    root->rchild = avl_right_rotate(root->rchild);
+    return avl_right_rotate(root);
+}
+
+avl_node* avl_insert(avl_node* root, int item)
+{
+    if(NULL == root)
     {
-        ret = avl_insert(root, item[i]);
-        if (OK != ret)
+        root = avl_init_node(item);
+    }
+    else if(item == root->key)
+        return root;
+    else if(item < root->key)
+    {
+        root->lchild = avl_insert(root->lchild, item);
+        if(Height(root->lchild) - Height(root->rchild) == 2)
         {
-            printf("avl_insert return error(code: %d)",ret);
+            if(item < root->lchild->key)
+            {
+                root = avl_right_rotate(root);
+                }
+            else
+            {
+                root = avl_leftright_rotate(root);
+                }
         }
     }
+    else if(item > root->key)
+    {
+        root->rchild = avl_insert(root->rchild, item);
+        if(Height(root->rchild) - Height(root->lchild) == 2)
+        {
+            if(item > root->rchild->key)
+            {
+                root = avl_left_rotate(root);
+                }
+            else
+            {
+                root = avl_rightleft_rotate(root);
+                }
+        }
+    }
+
+    root->height = MAX(Height(root->lchild), Height(root->rchild)) + 1;
+    
     return root;
 }
 

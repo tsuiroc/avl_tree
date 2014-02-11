@@ -6,11 +6,16 @@
 #define OK    1
 #define ERROR 0
 
+#define LH    1  
+#define EH    0
+#define RH   -1
+#define MAX(a,b) ((a)>(b) ? (a):(b))
+
 typedef struct AVL_NODE avl_node;
 struct AVL_NODE 
 {
     int key;
-    int balance;
+    int height;         
     avl_node *lchild;
     avl_node *rchild;
     avl_node *parent;
@@ -18,7 +23,7 @@ struct AVL_NODE
 
 int avl_search(avl_node* root, int item, avl_node **node);
 
-int avl_insert(avl_node* root, int item);
+avl_node* avl_insert(avl_node* root, int item);
 
 avl_node* avl_create(int *item, int size);
 
