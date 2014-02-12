@@ -51,7 +51,7 @@ avl_node* avl_init_node(int item)
 avl_node* avl_right_rotate(avl_node *root)
 {
     avl_node *tmp = root->lchild;
-    root->lchild = tmp->rchild;
+        root->lchild = tmp->rchild;
     tmp->rchild = root;
 
     root->height = MAX(Height(root->lchild), Height(root->rchild)) + 1;
@@ -75,13 +75,13 @@ avl_node* avl_left_rotate(avl_node *root)
 avl_node* avl_leftright_rotate(avl_node *root)
 {
     root->lchild = avl_left_rotate(root->lchild);
-    return avl_left_rotate(root);
+    return avl_right_rotate(root);
 }
 
 avl_node* avl_rightleft_rotate(avl_node *root)
 {
     root->rchild = avl_right_rotate(root->rchild);
-    return avl_right_rotate(root);
+    return avl_left_rotate(root);
 }
 
 avl_node* avl_insert(avl_node* root, int item)
@@ -133,13 +133,11 @@ void avl_middle_order(avl_node *root)
     if(NULL == root)
         return ;
 
-    if(NULL != root->lchild)
-        avl_middle_order(root->lchild);
+    avl_middle_order(root->lchild);
 
     printf(" %d ",root->key);
     
-    if(NULL != root->rchild)
-        avl_middle_order(root->rchild);
+    avl_middle_order(root->rchild);
 
     return ;
 }

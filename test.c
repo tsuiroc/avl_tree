@@ -6,16 +6,16 @@
 int main(int argc, char *argv[])
 {
 
-    int       data[] = {1, 3, 5, 6, 2, 3333};
+    int       data[] = {1, 7, 2, 4, 9, 3, 10, 18, 12};
     int i;
     avl_node *root = NULL;
 
     for(i = 0; i < sizeof(data)/sizeof(data[0]); i++)
     {
+        printf("insert %d\n",data[i]);
         root = avl_insert(root, data[i]);
-        }
+    }
 
-        printf("root %d\n",root->key);
     avl_middle_order(root);
     return 0;
 }
