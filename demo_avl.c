@@ -51,7 +51,7 @@ avl_node* avl_init_node(int item)
 avl_node* avl_right_rotate(avl_node *root)
 {
     avl_node *tmp = root->lchild;
-        root->lchild = tmp->rchild;
+    root->lchild = tmp->rchild;
     tmp->rchild = root;
 
     root->height = MAX(Height(root->lchild), Height(root->rchild)) + 1;
@@ -127,15 +127,107 @@ avl_node* avl_insert(avl_node* root, int item)
     
     return root;
 }
+void avl_delete(avl_node *root, int item)
+{
+    if(NULL == root)
+        return ;
+
+    if(item < root->key)
+    {
+        printf("go to lchild del:%d new:%d\n",item, root->key);
+        avl_delete(root->lchild, item);
+        if(Height(root->rchild) - Height(root->lchild) == 2)
+        {
+            printf("left rotate %d\n",root->key);
+            avl_left_rotate(root);
+        }
+    }
+    else if(item > root->key)
+    {
+        printf("go to rchild del:%d new:%d\n",item, root->key);
+        avl_delete(root->rchild, item);
+        if(Height(root->lchild) - Height(root->rchild) == 2)
+        {
+            printf("right rotate %d\n",root->key);
+            avl_right_rotate(root);
+        }
+    }
+    else
+    {
+        printf("get it del:%d new:%d\n",item, root->key);
+        avl_node *tmp = NULL;
+        if(root->lchild != NULL && root->rchild != NULL)
+        {
+            if(Height(root->lchild) > Height(root->rchild))
+            {
+                tmp = root->lchild;
+                while(tmp->rchild != NULL) tmp = tmp->rchild;
+                
+                root->key = tmp->key;
+                avl_delete(root->lchild, tmp->key);
+                free(tmp); tmp = NULL;
+            }
+            else
+            {
+                tmp = root->rchild;
+                while(tmp->lchild != NULL) tmp = tmp->lchild;
+                
+                root->key = tmp->key;
+                avl_delete(root->rchild, tmp->key);
+                free(tmp); tmp = NULL;
+            }
+        
+        }
+        else if(root->lchild == NULL && root->rchild != NULL)
+        {
+            root->parent->rchild = root->rchild;
+            root->rchild->parent = root->parent;
+            root->parent->height -= 1;
+            free(root); root = NULL;
+            return;
+        }
+        else if(root->lchild != NULL && root->rchild == NULL)
+        {
+            root->parent->lchild = root->lchild;
+            root->lchild->parent = root->parent;
+            root->parent->height -= 1;
+            free(root); root = NULL;
+            return;
+        }
+        else if(root->lchild == NULL && root->rchild == NULL)
+        {
+            free(root); root = NULL;
+        }
+    }
+
+    return ;
+}
+
+void avl_distory(avl_node *root)
+{
+    if(NULL == root)
+        return ;
+
+    if(NULL != root->lchild)
+        avl_distory(root->lchild);
+
+    if(NULL != root->rchild)
+        avl_distory(root->rchild);
+
+    free(root);
+
+    return ;
+}
 
 void avl_middle_order(avl_node *root)
 {
     if(NULL == root)
         return ;
 
+    printf(" %d ",root->key);
+
     avl_middle_order(root->lchild);
 
-    printf(" %d ",root->key);
     
     avl_middle_order(root->rchild);
 

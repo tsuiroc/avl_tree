@@ -12,10 +12,11 @@ int main(int argc, char *argv[])
 
     for(i = 0; i < sizeof(data)/sizeof(data[0]); i++)
     {
-        printf("insert %d\n",data[i]);
         root = avl_insert(root, data[i]);
     }
 
+    avl_middle_order(root);
+        avl_delete(root, 10);
     avl_middle_order(root);
     return 0;
 }
