@@ -16,7 +16,9 @@ int main(int argc, char *argv[])
     }
 
     avl_middle_order(root);
-        avl_delete(root, 10);
+    printf("\n\nnow delete 12:");
+    avl_delete(root, 12);
     avl_middle_order(root);
+    avl_distory(root);
     return 0;
 }
